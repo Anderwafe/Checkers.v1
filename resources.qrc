@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file alias="checker_black">checkers_black.png</file>
+        <file alias="checker_white">checkers_white.png</file>
+    </qresource>
+</RCC>
