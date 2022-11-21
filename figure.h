@@ -6,8 +6,6 @@
 #include <QMouseEvent>
 #include <QResizeEvent>
 
-#include "cell.h"
-
 class Figure : public QLabel
 {
     Q_OBJECT

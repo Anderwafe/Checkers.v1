@@ -1,6 +1,5 @@
 #include "gamewindow.h"
 #include "ui_gamewindow.h"
-#include "figure.h"
 
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent),
