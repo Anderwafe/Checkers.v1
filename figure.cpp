@@ -37,7 +37,6 @@ void Figure::mouseReleaseEvent(QMouseEvent *event)
 Figure::Figure(QWidget* parent, bool isWhite) : QLabel(parent)
 {
     b_move = false;
-    //this->setText("Label)");
     this->isWhite = isWhite;
     this->setBaseSize(50, 50);
     this->setMinimumSize(50,50);

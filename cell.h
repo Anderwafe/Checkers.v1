@@ -1,18 +1,20 @@
+
+
 #ifndef CELL_H
 #define CELL_H
 
 #include <QLabel>
-#include "figure.h"
 
 class Cell : public QLabel
 {
     Q_OBJECT
 protected:
     bool isWhite;
-    Figure *figure;
+    //Figure *figure;
 
 public:
-    Cell(QWidget *parent = nullptr, bool isWhite = false, Figure *figureOnCell = nullptr);
+    Cell(QWidget *parent = nullptr, bool isWhite = false);
+    //bool setFigure(Figure *figure = nullptr);
 };
 
 #endif // CELL_H
