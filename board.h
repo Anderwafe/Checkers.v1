@@ -5,9 +5,11 @@
 #include <QVBoxLayout>
 #include "cell.h"
 #include "figure.h"
+#include <QObject>
 
-class Board
+class Board : public QObject
 {
+    Q_OBJECT
 protected:
     unsigned int h, w;
     unsigned int figuresCount;
@@ -16,6 +18,8 @@ protected:
     QVBoxLayout *layout;
     QHBoxLayout **columnLayouts;
 
+public slots:
+    void checkTurn(Figure *figure, QWidget *start_pos, QWidget *new_pos);
 
 public:
     Board(QWidget *parent = nullptr, unsigned int h = 10, unsigned int w = 10, unsigned int countOfFigures = 20);

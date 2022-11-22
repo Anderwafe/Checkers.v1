@@ -11,20 +11,23 @@ class Figure : public QLabel
     Q_OBJECT
 protected:
     bool b_move;
-    QPoint* start_point = nullptr;
-    QPoint* prev_point = nullptr;
     bool isWhite;
-    Cell *cell;
+
+    QWidget *_parentWidget;
+    QWidget *_boardWidget;
 
     void resizeEvent(QResizeEvent *size);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
-public:
-    Figure(QWidget* parent = nullptr, bool isWhite = true);
-    ~Figure();
+signals:
+    void turnAttempt(Figure *figure, QWidget *start_pos, QWidget *new_pos);
 
+public:
+    Figure(QWidget *parent = nullptr, bool isWhite = true, QWidget *board = nullptr);
+    ~Figure();
+    bool changeDefaultPos(QPoint new_pos);
 };
 
 #endif // FIGURE_H

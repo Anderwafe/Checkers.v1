@@ -6,7 +6,7 @@ GameWindow::GameWindow(QWidget *parent) :
     ui(new Ui::GameWindow)
 {
     ui->setupUi(this);
-    board = new Board(this);
+    board = new Board(ui->groupBox);
     ui->groupBox->setLayout(board->getBoard());
     board->Show();
 }

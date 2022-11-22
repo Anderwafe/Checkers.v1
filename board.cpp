@@ -21,12 +21,30 @@ Board::Board(QWidget *parent, unsigned int h, unsigned int w, unsigned int count
     }
 
     figures = new Figure*[countOfFigures * 2];
-    for(unsigned int i = 0; i < countOfFigures; i++)
+    for(unsigned int i = 0, j = 0, k = h * w - 1; i < countOfFigures; i++)
     {
-        figures[i] = new Figure(parent, true);
-        figures[countOfFigures * 2 - 1 - i] = new Figure(parent, false);
+        while(cells[j]->isWhite) j++;
+        figures[i] = new Figure(cells[j], false, parent);
+        connect(figures[i], SIGNAL(turnAttempt(Figure*,QWidget*,QWidget*)), this, SLOT(checkTurn(Figure*,QWidget*,QWidget*)));
+        //figures[i] = new Figure(parent, false, cells[j]->pos());
+        //cells[j]->setLayout(new QHBoxLayout(parent));
+        //cells[j]->layout()->addWidget(figures[i]);
+        j++;
+
+        while(cells[k]->isWhite) k--;
+        figures[countOfFigures * 2 - 1 - i] = new Figure(cells[k], true, parent);
+        connect(figures[countOfFigures * 2 - 1 - i], SIGNAL(turnAttempt(Figure*,QWidget*,QWidget*)), this, SLOT(checkTurn(Figure*,QWidget*,QWidget*)));
+        //figures[countOfFigures * 2 - 1 - i] = new Figure(parent, true, cells[k]->pos());
+        //cells[k]->setLayout(new QHBoxLayout(parent));
+        //cells[k]->layout()->addWidget(figures[countOfFigures * 2 - 1 - i]);
+        k--;
 
     }
+}
+
+void Board::checkTurn(Figure *figure, QWidget *start_pos, QWidget *new_pos)
+{
+
 }
 
 void Board::Show()
@@ -34,6 +52,10 @@ void Board::Show()
     for(unsigned int i = 0; i < w*h; i++)
     {
         cells[i]->show();
+    }
+    for(unsigned int i = 0; i < figuresCount; i++)
+    {
+        figures[i]->show();
     }
 }
 

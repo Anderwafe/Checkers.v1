@@ -9,12 +9,11 @@ class Cell : public QLabel
 {
     Q_OBJECT
 protected:
-    bool isWhite;
-    //Figure *figure;
 
 public:
     Cell(QWidget *parent = nullptr, bool isWhite = false);
-    //bool setFigure(Figure *figure = nullptr);
+
+    bool isWhite;
 };
 
 #endif // CELL_H
