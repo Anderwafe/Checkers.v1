@@ -13,13 +13,18 @@ class Board : public QObject
 protected:
     unsigned int h, w;
     unsigned int figuresCount;
+
     Cell **cells;
-    Figure **figures;
     QVBoxLayout *layout;
     QHBoxLayout **columnLayouts;
+    Figure *_selectedFigure;
+    Figure **figures;
+
+    bool isWhiteTurn;
 
 public slots:
-    void checkTurn(Figure *figure, QWidget *start_pos, QWidget *new_pos);
+    void figureSelecting(Figure *figure);
+    void tryMakeTurn(Cell *cell);
 
 public:
     Board(QWidget *parent = nullptr, unsigned int h = 10, unsigned int w = 10, unsigned int countOfFigures = 20);

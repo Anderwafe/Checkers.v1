@@ -1,5 +1,7 @@
 #include "figure.h"
 #include <QApplication>
+#include <QSizePolicy>
+
 void Figure::resizeEvent(QResizeEvent *size)
 {
     this->setPixmap(this->pixmap().scaled(size->size()));
@@ -9,26 +11,27 @@ void Figure::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
-        _parentWidget = this->parentWidget();
+        emit figureSelected(this);
+        /*_parentWidget = this->parentWidget();
         this->hide();
         this->setParent(_boardWidget);
         move(this->mapToParent(event->pos()));
         this->show();
-        b_move = true;
+        b_move = true;*/
     }
 }
 
 void Figure::mouseMoveEvent(QMouseEvent *event)
 {
-    if((event->buttons() & Qt::LeftButton) && b_move)
+    /*if((event->buttons() & Qt::LeftButton) && b_move)
     {
         move(this->mapToParent(event->pos()));
-    }
+    }*/
 }
 
 void Figure::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton && b_move)
+    /*if (event->button() == Qt::LeftButton && b_move)
     {
         b_move = false;
         qDebug() << pos().x() << " " << pos().y();
@@ -37,13 +40,12 @@ void Figure::mouseReleaseEvent(QMouseEvent *event)
         this->setParent(_parentWidget);
         this->show();
         //move(QPoint(0, 0));
-    }
+    }*/
 }
 
-bool Figure::changeDefaultPos(QPoint new_pos)
+void Figure::parentResized(QResizeEvent *size)
 {
-    if(new_pos.x() < 0 || new_pos.y() < 0) return false;
-    return true;
+    this->resize(size->size());
 }
 
 Figure::Figure(QWidget* parent, bool isWhite, QWidget *board) : QLabel()
@@ -51,7 +53,7 @@ Figure::Figure(QWidget* parent, bool isWhite, QWidget *board) : QLabel()
     setParent(parent);
     _parentWidget = parent;
 
-    b_move = false;
+    //b_move = false;
     this->isWhite = isWhite;
     this->setBaseSize(25, 25);
     this->setMinimumSize(25,25);

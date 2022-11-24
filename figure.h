@@ -10,8 +10,6 @@ class Figure : public QLabel
 {
     Q_OBJECT
 protected:
-    bool b_move;
-    bool isWhite;
 
     QWidget *_parentWidget;
     QWidget *_boardWidget;
@@ -21,13 +19,17 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
+public slots:
+    void parentResized(QResizeEvent *size);
+
 signals:
-    void turnAttempt(Figure *figure, QWidget *start_pos, QWidget *new_pos);
+    void figureSelected(Figure *figure);
 
 public:
     Figure(QWidget *parent = nullptr, bool isWhite = true, QWidget *board = nullptr);
     ~Figure();
-    bool changeDefaultPos(QPoint new_pos);
+
+    bool isWhite;
 };
 
 #endif // FIGURE_H

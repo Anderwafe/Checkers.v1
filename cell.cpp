@@ -8,3 +8,16 @@ Cell::Cell(QWidget *parent, bool isWhite) : QLabel(parent)
     if(isWhite) this->setPalette(QPalette(Qt::GlobalColor::white));
             else this->setPalette(QPalette(Qt::GlobalColor::darkGray));
 }
+
+void Cell::resizeEvent(QResizeEvent *size)
+{
+    emit resized(size);
+}
+
+void Cell::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton)
+    {
+        emit cellSelected(this);
+    }
+}
