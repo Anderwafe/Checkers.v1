@@ -1,9 +1,9 @@
 #include "board.h"
 
+#include <QMessageBox>
+
 Board::Board(QWidget *parent, unsigned int h, unsigned int w, unsigned int countOfFigures)
 {
-    isWhiteTurn = true;
-
     _selectedFigure = nullptr;
 
     this->h = h;
@@ -12,21 +12,20 @@ Board::Board(QWidget *parent, unsigned int h, unsigned int w, unsigned int count
 
     layout = new QVBoxLayout(parent);
     columnLayouts = new QHBoxLayout*[h];
-    cells = new Cell*[h * w];
     for(unsigned int i = 0; i < h; i++)
     {
         columnLayouts[i] = new QHBoxLayout();
         layout->addLayout(columnLayouts[i]);
         for(unsigned int j = 0; j < w; j++)
         {
-            cells[i * w + j] = new Cell(parent, !((j % 2 + i % 2) % 2));
-            cells[i * w + j]->setObjectName(QString::number(i) + "_" + QString::number(j));
-            columnLayouts[i]->addWidget(cells[i*w+j]);
-            connect(cells[i * w + j], SIGNAL(cellSelected(Cell*)), this, SLOT(tryMakeTurn(Cell*)));
+            cells.push_back(new Cell(parent, !((j % 2 + i % 2) % 2)));
+            cells[i*w + j]->setObjectName(QString::number(i) + "_" + QString::number(j));
+            columnLayouts[i]->addWidget(cells[i*w + j]);
+            connect(cells[i*w + j], SIGNAL(cellSelected(Cell*)), this, SLOT(tryMakeTurn(Cell*)));
         }
     }
 
-    figures = new Figure*[countOfFigures * 2];
+    figures.resize(countOfFigures * 2);
     for(unsigned int i = 0, j = 0, k = h * w - 1; i < countOfFigures; i++)
     {
         while(cells[j]->isWhite) j++;
@@ -44,63 +43,142 @@ Board::Board(QWidget *parent, unsigned int h, unsigned int w, unsigned int count
         k--;
 
     }
+
+
+
+    startTurn(true);
+}
+
+Figure* Board::findFigureOnCell(Cell *cell)
+{
+    for(unsigned int i = 0; i < figuresCount * 2; i++)
+    {
+        if((figures[i] == nullptr) || (figures[i]->isHidden())) continue;
+        if(figures[i]->parentWidget()->objectName() == cell->objectName())
+            return figures[i];
+    }
+    return nullptr;
+}
+
+void Board::startTurn(bool isWhiteTurn)
+{
+    _selectedFigure = nullptr;
+    this->isWhiteTurn = isWhiteTurn;
+
+    for(unsigned int i = 0; i < figuresCount * 2; i++)
+    {
+        if(figures[i]->isHidden())
+        {
+            figures[i]->setParent(nullptr);
+        }
+        else
+        {
+            if(((figures[i]->parentWidget()->objectName()[0] == '0') && (figures[i]->isWhite)) || ((figures[i]->parentWidget()->objectName()[0] == '9') && (!figures[i]->isWhite)))
+            {
+                figures[i]->makeKing();
+            }
+        }
+    }
+
+    std::vector<std::vector<unsigned long long>> buf;
+    for(unsigned int j = 0; j < h; j++)
+    {
+        buf.push_back(std::vector<unsigned long long>());
+        for(unsigned int k = 0; k < w; k++)
+        {
+            buf[j].push_back((unsigned long long)(findFigureOnCell(cells[j*w + k]) == nullptr ? 0 : findFigureOnCell(cells[j*w + k])));
+        }
+    }
+
+    turns.clear();
+    for(unsigned int i = 0; i < figuresCount; i++)
+    {
+        if(figures[i + (isWhiteTurn ? 0 : figuresCount)]->parentWidget() != nullptr)
+        {
+            if(figures[i + (isWhiteTurn ? 0 : figuresCount)]->availableTurns != nullptr)
+            {
+                delete figures[i + (isWhiteTurn ? 0 : figuresCount)]->availableTurns;
+                figures[i + (isWhiteTurn ? 0 : figuresCount)]->availableTurns = nullptr;
+            }
+        }
+        if(figures[i + (isWhiteTurn ? figuresCount : 0)]->parentWidget() != nullptr)
+        {
+            QPoint pos = QPoint(figures[i + (isWhiteTurn ? figuresCount : 0)]->parentWidget()->objectName()[2].digitValue(), figures[i + (isWhiteTurn ? figuresCount : 0)]->parentWidget()->objectName()[0].digitValue());
+            figures[i + (isWhiteTurn ? figuresCount : 0)]->availableTurns = new tree(pos, 0, figures[i + (isWhiteTurn ? figuresCount : 0)]->isKing, buf, figures[i + (isWhiteTurn ? figuresCount : 0)]->isWhite);
+            auto bufturns = figures[i + (isWhiteTurn ? figuresCount : 0)]->availableTurns->getTurns();
+            for(unsigned long j = 0; j < bufturns.size(); j++)
+            {
+                turns.push_back(bufturns[j]);
+            }
+        }
+    }
+    if(turns.empty())
+    {
+        QMessageBox::critical(nullptr, "Winner!", this->isWhiteTurn ? "Black wins!" : "White wins!");
+    }
+
+    /*bool win = true;
+    for(int i = 0; i < figuresCount; i++)
+    {
+        if(figures[i]->parentWidget() != nullptr)
+        {
+            win = false;
+            break;
+        }
+    }
+    if(win && this->isWhiteTurn)
+    {
+        QMessageBox::critical(nullptr, "Winner!", this->isWhiteTurn ? "Black wins!" : "White wins!");
+    }
+    win = true;*/
+}
+
+void Board::moveFigure(Figure *figure, Cell *cell)
+{
+    figure->hide();
+    figure->setParent(nullptr);
+    figure->setParent(cell);
+    figure->show();
 }
 
 void Board::tryMakeTurn(Cell *cell)
 {
     qDebug() << cell->objectName();
-    if(_selectedFigure != nullptr)
+    if(_selectedFigure == nullptr) return;
+
+    auto figureturns = _selectedFigure->availableTurns->getTurns();
+    for(unsigned long i = 0; i < figureturns.size(); i++)
     {
-        int current_h = QString(((Cell*)_selectedFigure->parentWidget())->objectName()[0]).toInt();
-        int current_w = QString(((Cell*)_selectedFigure->parentWidget())->objectName()[2]).toInt();
-
-        int new_h = QString(cell->objectName()[0]).toInt();
-        int new_w = QString(cell->objectName()[2]).toInt();
-        if((abs(current_h - new_h) == 1) && (abs(current_w - new_w) == 1))
+        QString name = QString::number(figureturns[i].stop.y()) + "_" + QString::number(figureturns[i].stop.x());
+        if(name == cell->objectName())
         {
-            if(((new_h - current_h) == 1 && !_selectedFigure->isWhite) || ((new_h - current_h) == -1 && _selectedFigure->isWhite))
+            bool trueTurn = true;
+            for(unsigned long j = 0; j < turns.size(); j++)
             {
-                qDebug() << _selectedFigure->objectName();
-                _selectedFigure->hide();
-                _selectedFigure->setParent(nullptr);
-                _selectedFigure->setParent(cell);
-                _selectedFigure->show();
-
-                _selectedFigure = nullptr;
-
-                isWhiteTurn = !isWhiteTurn;
-            }
-        }
-        if((abs(current_h - new_h) == 2) && (abs(current_w - new_w) == 2))
-        {
-            qDebug() << "abs ok";
-            for(unsigned int i = 0; i < figuresCount * 2; i++)
-            {
-                if(!figures[i]->isHidden() && (figures[i] != nullptr))
+                if(figureturns[i].weight < turns[j].weight)
                 {
-                    qDebug() << figures[i]->parentWidget()->objectName() << " " <<(QString::number((new_h + current_h) / 2) + "_" + QString::number((new_w + current_w) / 2));
-                    if(figures[i]->parentWidget()->objectName() == (QString::number((new_h + current_h) / 2) + "_" + QString::number((new_w + current_w) / 2)))
+                    trueTurn = false;
+                    break;
+                }
+            }
+            if(!trueTurn) continue;
+            for(unsigned int j = 0; j < figuresCount * 2; j++)
+            {
+                if(figures[j] == nullptr) continue;
+                figures[j]->hide();
+            }
+
+            for(unsigned int j = 0; j < h; j++)
+            {
+                for(unsigned int k = 0; k < w; k++)
+                {
+                    if(figureturns[i].playground[j][k] != 0)
                     {
-                        qDebug() << "objectName is ok";
-                        if((figures[i]->isWhite && !_selectedFigure->isWhite) || (!figures[i]->isWhite && _selectedFigure->isWhite))
-                        {
-                            qDebug() << "turn is ok";
-                            qDebug() << _selectedFigure->objectName();
-                            _selectedFigure->hide();
-                            _selectedFigure->setParent(nullptr);
-                            _selectedFigure->setParent(cell);
-                            _selectedFigure->show();
-
-                            _selectedFigure = nullptr;
-
-                            isWhiteTurn = !isWhiteTurn;
-
-                            figures[i]->hide();
-                            break;
-                        }
+                        moveFigure((Figure*)figureturns[i].playground[j][k], cells[j * w + k]);
                     }
                 }
             }
+            startTurn(!isWhiteTurn);
         }
     }
 }
@@ -108,10 +186,24 @@ void Board::tryMakeTurn(Cell *cell)
 void Board::figureSelecting(Figure *figure)
 {
     qDebug() << "Touched: " << figure->objectName() << "Is white? " << figure->isWhite << " " << figure->parentWidget()->objectName();
+
     if((figure->isWhite && isWhiteTurn) || (!figure->isWhite && !isWhiteTurn))
     {
-        qDebug() << "Selected ";
-        this->_selectedFigure = figure;
+        if(figure == _selectedFigure)
+        {
+            auto figureturns = figure->availableTurns->getTurns();
+            for(unsigned int i = 0; i < figureturns.size(); i++)
+            {
+                if(figureturns[i].start == figureturns[i].stop)
+                {
+                    tryMakeTurn(cells[figureturns[i].stop.y() * w + figureturns[i].stop.x()]);
+                }
+            }
+        }
+
+        qDebug() << "selected";
+
+        _selectedFigure = figure;
     }
 }
 
@@ -131,8 +223,8 @@ Board::~Board()
 {
     delete layout;
     delete[] columnLayouts;
-    delete[] figures;
-    delete[] cells;
+    figures.clear();
+    cells.clear();
 }
 
 QLayout* Board::getBoard()

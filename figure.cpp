@@ -48,10 +48,21 @@ void Figure::parentResized(QResizeEvent *size)
     this->resize(size->size());
 }
 
+bool Figure::makeKing()
+{
+    this->isKing = true;
+    QPixmap pixmap = QPixmap(isWhite ? ":/new/prefix1/checker_white_king" : ":/new/prefix1/checker_black_king");
+    pixmap = pixmap.scaled(25, 25);
+    this->setPixmap(pixmap.scaled(this->pixmap().size()));
+    return true;
+}
+
+
 Figure::Figure(QWidget* parent, bool isWhite, QWidget *board) : QLabel()
 {
     setParent(parent);
     _parentWidget = parent;
+    isKing = false;
 
     //b_move = false;
     this->isWhite = isWhite;
@@ -69,5 +80,9 @@ Figure::Figure(QWidget* parent, bool isWhite, QWidget *board) : QLabel()
 
 Figure::~Figure()
 {
+    if(availableTurns != nullptr) delete availableTurns;
     qDebug() << "шашка удалена";
 }
+
+
+

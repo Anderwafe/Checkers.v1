@@ -2,5 +2,7 @@
     <qresource prefix="/new/prefix1">
         <file alias="checker_black">checkers_black.png</file>
         <file alias="checker_white">checkers_white.png</file>
+        <file alias="checker_black_king">checkers_black_king.jpg</file>
+        <file alias="checker_white_king">checkers_white_king.jpg</file>
     </qresource>
 </RCC>

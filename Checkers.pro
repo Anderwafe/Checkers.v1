@@ -14,14 +14,18 @@ SOURCES += \
     figure.cpp \
     gamewindow.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    tree.cpp \
+    turn.cpp
 
 HEADERS += \
     board.h \
     cell.h \
     figure.h \
     gamewindow.h \
-    mainwindow.h
+    mainwindow.h \
+    tree.h \
+    turn.h
 
 FORMS += \
     gamewindow.ui \
