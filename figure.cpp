@@ -4,7 +4,7 @@
 
 void Figure::resizeEvent(QResizeEvent *size)
 {
-    this->setPixmap(this->pixmap().scaled(size->size()));
+    this->setPixmap(origin.scaled(size->size()));
 }
 
 void Figure::mousePressEvent(QMouseEvent *event)
@@ -51,9 +51,8 @@ void Figure::parentResized(QResizeEvent *size)
 bool Figure::makeKing()
 {
     this->isKing = true;
-    QPixmap pixmap = QPixmap(isWhite ? ":/new/prefix1/checker_white_king" : ":/new/prefix1/checker_black_king");
-    pixmap = pixmap.scaled(25, 25);
-    this->setPixmap(pixmap.scaled(this->pixmap().size()));
+    origin = QPixmap(isWhite ? ":/new/prefix1/checker_white_king" : ":/new/prefix1/checker_black_king");
+    this->setPixmap(origin.scaled(this->pixmap().size()));
     return true;
 }
 
@@ -71,11 +70,9 @@ Figure::Figure(QWidget* parent, bool isWhite, QWidget *board) : QLabel()
     this->setAlignment(Qt::AlignCenter);
 
     _boardWidget = board;
-    //move(QPoint(0,0));
 
-    QPixmap pixmap = QPixmap(isWhite ? ":/new/prefix1/checker_white" : ":/new/prefix1/checker_black");
-    pixmap = pixmap.scaled(25, 25);
-    this->setPixmap(pixmap);
+    origin = QPixmap(isWhite ? ":/new/prefix1/checker_white" : ":/new/prefix1/checker_black");
+    this->setPixmap(origin);
 }
 
 Figure::~Figure()

@@ -7,7 +7,6 @@
 #include <QResizeEvent>
 #include <QPoint>
 #include <vector>
-//#include "tree.h"
 #include "turn.h"
 
 class tree;
@@ -17,6 +16,7 @@ class Figure : public QLabel
     Q_OBJECT
 protected:
 
+    QPixmap origin;
     QWidget *_parentWidget;
     QWidget *_boardWidget;
 

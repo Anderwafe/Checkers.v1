@@ -165,6 +165,7 @@ void Board::tryMakeTurn(Cell *cell)
                     }
                 }
             }
+            emit turnComplete(figureturns[i]);
             startTurn(!isWhiteTurn);
             return;
         }

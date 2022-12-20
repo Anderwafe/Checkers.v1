@@ -18,6 +18,7 @@ public:
 
 public slots:
     void takeMessage(QString message);
+    void takeTurnInfo(turn info);
 
 private:
     Ui::GameWindow *ui;

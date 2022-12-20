@@ -42,6 +42,7 @@ public:
 
 signals:
     void messageCreated(QString message);
+    void turnComplete(turn info);
 };
 
 #endif // BOARD_H
