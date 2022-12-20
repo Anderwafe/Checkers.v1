@@ -114,23 +114,10 @@ void Board::startTurn(bool isWhiteTurn)
     }
     if(turns.empty())
     {
-        QMessageBox::critical(nullptr, "Winner!", this->isWhiteTurn ? "Black wins!" : "White wins!");
+        QMessageBox::information(nullptr, "Winner!", this->isWhiteTurn ? "Black wins!" : "White wins!");
     }
 
-    /*bool win = true;
-    for(int i = 0; i < figuresCount; i++)
-    {
-        if(figures[i]->parentWidget() != nullptr)
-        {
-            win = false;
-            break;
-        }
-    }
-    if(win && this->isWhiteTurn)
-    {
-        QMessageBox::critical(nullptr, "Winner!", this->isWhiteTurn ? "Black wins!" : "White wins!");
-    }
-    win = true;*/
+    emit messageCreated(this->isWhiteTurn ? "White turn" : "Black turn");
 }
 
 void Board::moveFigure(Figure *figure, Cell *cell)
@@ -179,8 +166,10 @@ void Board::tryMakeTurn(Cell *cell)
                 }
             }
             startTurn(!isWhiteTurn);
+            return;
         }
     }
+    emit messageCreated("Wrong turn!");
 }
 
 void Board::figureSelecting(Figure *figure)
@@ -189,15 +178,23 @@ void Board::figureSelecting(Figure *figure)
 
     if((figure->isWhite && isWhiteTurn) || (!figure->isWhite && !isWhiteTurn))
     {
+
+        auto figureturns = figure->availableTurns->getTurns();
         if(figure == _selectedFigure)
         {
-            auto figureturns = figure->availableTurns->getTurns();
             for(unsigned int i = 0; i < figureturns.size(); i++)
             {
                 if(figureturns[i].start == figureturns[i].stop)
                 {
                     tryMakeTurn(cells[figureturns[i].stop.y() * w + figureturns[i].stop.x()]);
                 }
+            }
+        }
+        else
+        {
+            for(unsigned int i = 0; i < figureturns.size(); i++)
+            {
+                qDebug() << "Point: " << figureturns[i].stop << "; Weight: " << figureturns[i].weight;
             }
         }
 

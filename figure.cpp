@@ -67,7 +67,7 @@ Figure::Figure(QWidget* parent, bool isWhite, QWidget *board) : QLabel()
     //b_move = false;
     this->isWhite = isWhite;
     this->setBaseSize(25, 25);
-    this->setMinimumSize(25,25);
+    this->setMinimumSize(1,1);
     this->setAlignment(Qt::AlignCenter);
 
     _boardWidget = board;

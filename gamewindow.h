@@ -16,6 +16,9 @@ public:
     explicit GameWindow(QWidget *parent = nullptr);
     ~GameWindow();
 
+public slots:
+    void takeMessage(QString message);
+
 private:
     Ui::GameWindow *ui;
     Board* board;

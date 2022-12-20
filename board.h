@@ -39,6 +39,9 @@ public:
     void Show();
     ~Board();
     QLayout* getBoard();
+
+signals:
+    void messageCreated(QString message);
 };
 
 #endif // BOARD_H
