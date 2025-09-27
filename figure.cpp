@@ -1,6 +1,7 @@
 #include "figure.h"
 #include <QApplication>
 #include <QSizePolicy>
+#include <QDebug>
 
 void Figure::resizeEvent(QResizeEvent *size)
 {
@@ -52,7 +53,7 @@ bool Figure::makeKing()
 {
     this->isKing = true;
     origin = QPixmap(isWhite ? ":/new/prefix1/checker_white_king" : ":/new/prefix1/checker_black_king");
-    this->setPixmap(origin.scaled(this->pixmap().size()));
+    this->setPixmap(origin.scaled(this->pixmap()->size()));
     return true;
 }
 
